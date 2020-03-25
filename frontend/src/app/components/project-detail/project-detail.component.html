@@ -1,12 +1,12 @@
 <div class="centered">
   <div *ngIf="project">
     <div>
-      <label>GitHub repo: <a href="{{ project.url }}">{{ project.url }}</a></label>
+      <label>Keyboard id: {{ project.keyboardId }}</label>
     </div>
     <div>
-      <label>Keyboard id: <input [(ngModel)]="project.name" placeholder="name"/></label>
+      <label>GitHub repo: <a href="{{ project.url }}">{{ project.url }}</a></label>
     </div>
-    <button (click)="createPullRequest()">Create pull request</button>
+    <a [routerLink]="['/projects', project.repoName, 'pr']"><button>Create pull request</button></a>
   </div>
   <div *ngIf="!project">
     <div class="spinner">

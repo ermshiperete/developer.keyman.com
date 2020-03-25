@@ -25,7 +25,4 @@ export class ProjectDetailComponent implements OnInit {
       (project: Project) => this.project = project,
     );
   }
-
-  public createPullRequest(): void {
-  }
 }
