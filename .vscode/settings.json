@@ -1,10 +1,19 @@
 {
-    "cSpell.words": [
-        "middlewares",
-        "nestjs",
-        "prestart"
-    ],
-    "debug.node.autoAttach": "off",
-    "files.autoSave": "onFocusChange",
-    "jestrunner.configPath": "frontend/jest.config.js"
+  "cSpell.words": [
+    "middlewares",
+    "nestjs",
+    "prestart"
+  ],
+  "debug.node.autoAttach": "off",
+  "files.autoSave": "onFocusChange",
+  "jestrunner.configPath": "frontend/jest.config.js",
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.quoteStyle": "single",
+  "importSorter.importStringConfiguration.tabSize": 2,
+  "importSorter.sortConfiguration.removeUnusedImports": true,
+  "importSorter.sortConfiguration.removeUnusedDefaultImports": true,
+  "importSorter.generalConfiguration.sortOnBeforeSave": true,
+  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 98,
 }
