@@ -148,7 +148,7 @@ export class PullRequestService {
     );
   }
 
-  private getNewPathPrefix(singleRepoName: string): string {
+  public getNewPathPrefix(singleRepoName: string): string {
     // git uses / as directory separator, even on Windows
     return `release/${singleRepoName.substring(0, 1)}/${singleRepoName}`;
   }

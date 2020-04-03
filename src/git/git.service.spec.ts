@@ -5,7 +5,7 @@ import { CommitSummary } from 'simple-git/promise';
 import * as simplegit from 'simple-git/promise';
 import { deleteFolderRecursive } from '../utils/delete-folder';
 import { GitService } from './git.service';
-import { appendFile, fileExists, mkdir, mkdtemp } from '../utils/file';
+import { appendFile, fileExists, mkdir, mkdtemp, writeFile, deleteFile } from '../utils/file';
 
 import os = require('os');
 import path = require('path');
@@ -802,5 +802,103 @@ describe('GitService', () => {
       // Verify
       expect(head).toBe('');
     });
+  });
+
+  describe('getModifiedFiles', () => {
+    it('returns added text file', async () => {
+      // Setup
+      expect.assertions(4);
+      const repoDir = await sut.createRepo(path.join(tmpDir, 'mytest')).toPromise();
+      await createInitialCommit(sut, repoDir).toPromise();
+      const newFile = path.join(repoDir, 'newTextFile.txt');
+      await appendFile(newFile, 'some text').toPromise();
+      await sut.addFile(repoDir, newFile).toPromise();
+      const commit = await sut.commit(repoDir, 'Second commit').toPromise();
+
+      // Execute
+      const result = await sut.getModifiedFiles(repoDir, commit.commit).toPromise();
+
+      // Verify
+      expect(result.changed).toBe(1);
+      expect(result.deletions).toBe(0);
+      expect(result.insertions).toBe(1);
+      expect(result.files).toEqual([{
+        file: 'newTextFile.txt',
+        changes: 1,
+        insertions: 1,
+        deletions: 0,
+        binary: false,
+      }]);
+    });
+
+    it('returns added binary and modified text file', async () => {
+      // Setup
+      expect.assertions(4);
+      const repoDir = await sut.createRepo(path.join(tmpDir, 'mytest')).toPromise();
+      await createInitialCommit(sut, repoDir).toPromise();
+      const textFile = path.join(repoDir, 'newTextFile.txt');
+      await appendFile(textFile, 'some text\nsecond line').toPromise();
+      await sut.addFile(repoDir, textFile).toPromise();
+      const gitattributes = path.join(repoDir, '.gitattributes');
+      await writeFile(gitattributes, 'newBinaryFile binary').toPromise();
+      await sut.addFile(repoDir, gitattributes).toPromise();
+      await sut.commit(repoDir, 'Second commit').toPromise();
+      await writeFile(textFile, 'some text\ndifferent text\nmore text').toPromise();
+      await sut.addFile(repoDir, textFile).toPromise();
+      const binaryFile = path.join(repoDir, 'newBinaryFile');
+      await writeFile(binaryFile, 'This pretends to be a binary file').toPromise();
+      await sut.addFile(repoDir, binaryFile).toPromise();
+      const commit = await sut.commit(repoDir, 'Third commit').toPromise();
+
+      // Execute
+      const result = await sut.getModifiedFiles(repoDir, commit.commit).toPromise();
+
+      // Verify
+      expect(result.changed).toBe(2);
+      expect(result.deletions).toBe(1);
+      expect(result.insertions).toBe(2);
+      expect(result.files).toEqual([
+        {
+          file: 'newBinaryFile',
+          before: 0,
+          after: 33,
+          binary: true,
+        },
+        {
+          file: 'newTextFile.txt',
+          changes: 3,
+          insertions: 2,
+          deletions: 1,
+          binary: false,
+        },
+      ]);
+    });
+
+    it('returns deleted text file', async () => {
+      // Setup
+      expect.assertions(4);
+      const repoDir = await sut.createRepo(path.join(tmpDir, 'mytest')).toPromise();
+      await createInitialCommit(sut, repoDir).toPromise();
+      const filePath1 = path.join(repoDir, 'somefile1.txt');
+      await deleteFile(filePath1).toPromise();
+      await sut.addFile(repoDir, filePath1).toPromise();
+      const commit = await sut.commit(repoDir, 'Second commit').toPromise();
+
+      // Execute
+      const result = await sut.getModifiedFiles(repoDir, commit.commit).toPromise();
+
+      // Verify
+      expect(result.changed).toBe(1);
+      expect(result.deletions).toBe(1);
+      expect(result.insertions).toBe(0);
+      expect(result.files).toEqual([{
+        file: 'somefile1.txt',
+        changes: 1,
+        insertions: 0,
+        deletions: 1,
+        binary: false,
+      }]);
+    });
+
   });
 });

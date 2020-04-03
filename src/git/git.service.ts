@@ -3,7 +3,7 @@ import { Observable, from, throwError, of } from 'rxjs';
 import { map, flatMap, takeLast, switchMap, mapTo, catchError, tap } from 'rxjs/operators';
 import * as simplegit from 'simple-git/promise';
 import { CommitSummary, FetchResult, PullResult, Options } from 'simple-git/promise';
-import { ListLogSummary, DefaultLogFields, BranchSummary } from 'simple-git/typings/response';
+import { ListLogSummary, DefaultLogFields, BranchSummary, DiffResult } from 'simple-git/typings/response';
 
 import path = require('path');
 import debugModule = require('debug');
@@ -57,9 +57,10 @@ export class GitService {
     );
   }
 
-  public addFile(repoDir: string, filename: string): Observable<void> {
+  public addFile(repoDir: string, filename: string): Observable<string> {
     return from(this.git.cwd(repoDir)).pipe(
       switchMap(() => from(this.git.add(filename))),
+      map(() => filename),
     );
   }
 
@@ -177,6 +178,17 @@ export class GitService {
             return from(this.git.checkoutLocalBranch(name));
           }
         }
+      }),
+    );
+  }
+
+  public checkoutCommit(
+    repoDir: string,
+    commit: string,
+  ): Observable<void> {
+    return from(this.git.cwd(repoDir)).pipe(
+      switchMap(() => {
+        return from(this.git.checkout(commit));
       }),
     );
   }
@@ -353,6 +365,15 @@ export class GitService {
         }
         return of('');
       }),
+    );
+  }
+
+  public getModifiedFiles(
+    repoDir: string,
+    commit: string,
+  ): Observable<DiffResult> {
+    return from(this.git.cwd(repoDir)).pipe(
+      switchMap(() => this.git.diffSummary([`${commit}^`, commit])),
     );
   }
 }

@@ -2,7 +2,7 @@ import { HttpService, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as base64 from 'base-64';
 import { empty, Observable, interval, from, forkJoin, of } from 'rxjs';
-import { catchError, switchMap, takeWhile, takeLast, map, tap, mapTo } from 'rxjs/operators';
+import { catchError, switchMap, takeWhile, takeLast, map } from 'rxjs/operators';
 import session = require('supertest-session');
 import * as simplegit from 'simple-git/promise';
 import { AppModule } from '../src/app.module';

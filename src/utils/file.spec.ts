@@ -33,8 +33,9 @@ describe('Observable file methods', () => {
   describe('mkdir', () => {
     it('creates the directory', async () => {
       const dir = path.join(tmpDir, 'mkdir-newDir');
-      await mkdir(dir).toPromise();
+      const result = await mkdir(dir).toPromise();
       expect(fs.existsSync(dir)).toBe(true);
+      expect(result).toEqual(dir);
     });
 
     it('fails if directory already exists', () => {
@@ -49,8 +50,9 @@ describe('Observable file methods', () => {
 
     it('creates directory recursive', async () => {
       const dir = path.join(tmpDir, 'mkdir2-newDir', 'subdir');
-      await mkdir(dir, { recursive: true }).toPromise();
+      const result = await mkdir(dir, { recursive: true }).toPromise();
       expect(fs.existsSync(dir)).toBe(true);
+      expect(result).toEqual(dir);
     });
   });
 
@@ -67,11 +69,12 @@ describe('Observable file methods', () => {
       const filePath = path.join(tmpDir, 'writeFile-somefile.txt');
 
       // Execute
-      await writeFile(filePath, 'This is the file content.').toPromise();
+      const result = await writeFile(filePath, 'This is the file content.').toPromise();
 
       // Verify
       expect(await fileExists(filePath).toPromise()).toBe(true);
       expect(await readFile(filePath).toPromise()).toBe('This is the file content.');
+      expect(result).toEqual(filePath);
     });
   });
 
@@ -80,13 +83,14 @@ describe('Observable file methods', () => {
       const filePath = path.join(tmpDir, 'appendFile-somefile.txt');
 
       // Execute
-      await appendFile(filePath, 'This is the file content.').toPromise();
+      const result = await appendFile(filePath, 'This is the file content.').toPromise();
 
       // Verify
       expect(await fileExists(filePath).toPromise()).toBe(true);
       expect(await readFile(filePath).toPromise()).toBe(
         'This is the file content.',
       );
+      expect(result).toEqual(filePath);
     });
 
     it('appends file content', async () => {
@@ -94,13 +98,14 @@ describe('Observable file methods', () => {
       await writeFile(filePath, 'Initial file content.\n').toPromise();
 
       // Execute
-      await appendFile(filePath, 'Additional file content.').toPromise();
+      const result = await appendFile(filePath, 'Additional file content.').toPromise();
 
       // Verify
       expect(await fileExists(filePath).toPromise()).toBe(true);
       expect(await readFile(filePath).toPromise()).toBe(
         'Initial file content.\nAdditional file content.',
       );
+      expect(result).toEqual(filePath);
     });
   });
 
